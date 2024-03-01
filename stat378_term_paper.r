@@ -2,10 +2,40 @@
 library(reshape2)
 library(car)
 library(qpcR)
-data = read.table("C:\\Users\\adhig\\OneDrive\\Desktop\\University Courses\\STAT 378\\Term_Paper_-_DATA.txt", header = TRUE) # nolint
+data = read.table("C:\\Users\\baotn\\Uni Stuff\\University Subjects\\STAT\\STAT 378\\Term Paper -  Fall 2023 - Data.txt", header = FALSE) # nolint
 attach(data)
 View(data) # nolint
 # plot(data, main="Scatterplot of variables in Data set") # nolint
+colnames(data) <- cbind('ID',
+                        'LA',
+                        'TP',
+                        'PPCC',
+                        'PPA',
+                        'NAP',
+                        'NHB',
+                        'PHSG',
+                        'CLF',
+                        'TPI',
+                        'TSC',
+                        'GR')
+ID <- data$ID
+LA <- data$LA
+TP <- data$TP
+PPCC <- data$PPCC
+PPA <- data$PPA
+NAP <- data$NAP
+NHB <- data$NHB
+PHSG <- data$PHSG
+CLF <- data$CLF
+TPI <- data$TPI
+TSC <- data$TSC
+GR <- data$GR
+GR1 <- ifelse(data$GR == 1, 1, 0)
+GR2 <- ifelse(data$GR == 2, 1, 0)
+GR3 <- ifelse(data$GR == 3, 1, 0)
+
+data <- subset(data, select = -GR)
+data <- cbind(data, GR1, GR2, GR3)
 
 #######################################################################################################################################################################################################
 # SPLITTING DATA USING DUPLEX ALGORITHM
@@ -20,8 +50,12 @@ s8 = (length(PHSG) - 1) * var(PHSG)
 s9 = (length(CLF) - 1) * var(CLF)
 s10 = (length(TPI) - 1) * var(TPI)
 s11 = (length(TSC) - 1) * var(TSC)
-s12 = (length(GR) - 1) * var(GR)
-Z=cbind((ID-mean(ID))/sqrt(s1), (LA-mean(LA))/sqrt(s2), (TP-mean(TP))/sqrt(s3), (PPCC-mean(PPCC))/sqrt(s4), (PPA-mean(PPA))/sqrt(s5), (NAP-mean(NAP))/sqrt(s6), (NHB-mean(NHB))/sqrt(s7), (PHSG-mean(PHSG))/sqrt(s8), (CLF-mean(CLF))/sqrt(s9), (TPI-mean(TPI))/sqrt(s10), (TSC-mean(TSC))/sqrt(s11), (GR-mean(GR))/sqrt(s12)) # nolint
+s12 = (length(GR1) - 1) * var(GR1)
+s13 = (length(GR2) - 1) * var(GR2)
+s14 = (length(GR3) - 1) * var(GR3)
+
+
+Z=cbind((LA-mean(LA))/sqrt(s2), (TP-mean(TP))/sqrt(s3), (PPCC-mean(PPCC))/sqrt(s4), (PPA-mean(PPA))/sqrt(s5), (NAP-mean(NAP))/sqrt(s6), (NHB-mean(NHB))/sqrt(s7), (PHSG-mean(PHSG))/sqrt(s8), (CLF-mean(CLF))/sqrt(s9), (TPI-mean(TPI))/sqrt(s10), (TSC-mean(TSC))/sqrt(s11), (GR1-mean(GR1))/sqrt(s12), (GR2-mean(GR2))/sqrt(s13), (GR3-mean(GR3))/sqrt(s14)) # nolint
 #t(Z)%*%Z
 T=chol(t(Z)%*%Z)
 #t(T)%*%T
@@ -71,5 +105,8 @@ est_data <- data[-prediction_index,]
 #########################################################################################################################################################################################################
 
 attach(est_data)
-full_model = lm(TSC~ID+LA+TP+PPCC+PPA+PHSG+TPI+NAP+NHB+CLF+GR, data = est_data)
+full_model = lm(TSC~LA+TP+PPCC+PPA+PHSG+TPI+NAP+NHB+CLF+GR1+GR2+GR3, data = est_data)
+
+PRESS(full_model)
+plot(pred_data)
 
